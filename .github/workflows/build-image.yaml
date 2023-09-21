@@ -18,11 +18,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ vars.DOCKERHUB_USER }}/base-alpine
+      # - name: Docker meta
+      #   id: meta
+      #   uses: docker/metadata-action@v5
+      #   with:
+      #     images: ${{ vars.DOCKERHUB_USER }}/base-alpine
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -43,19 +43,20 @@ jobs:
           # push: true
           platforms: ${{ matrix.platform }}
           file: ./base-alpine/Dockerfile
-          labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ vars.DOCKERHUB_USER }}/base-alpine,push-by-digest=true,name-canonical=true,push=true
+          # labels: ${{ steps.meta.outputs.labels }}
+          # outputs: type=image,name=${{ vars.DOCKERHUB_USER }}/base-alpine,push-by-digest=true,name-canonical=true,push=true
+          tags: medianestdev/base-alpine:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Export digest
-        run: |
-          mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"          
-      - name: Upload digest
-        uses: actions/upload-artifact@v3
-        with:
-          name: digests
-          path: /tmp/digests/*
-          if-no-files-found: error
-          retention-days: 1
+      # - name: Export digest
+      #   run: |
+      #     mkdir -p /tmp/digests
+      #     digest="${{ steps.build.outputs.digest }}"
+      #     touch "/tmp/digests/${digest#sha256:}"          
+      # - name: Upload digest
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: digests
+      #     path: /tmp/digests/*
+      #     if-no-files-found: error
+      #     retention-days: 1
