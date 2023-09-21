@@ -45,6 +45,7 @@ jobs:
           file: ./base-alpine/Dockerfile
           # labels: ${{ steps.meta.outputs.labels }}
           # outputs: type=image,name=${{ vars.DOCKERHUB_USER }}/base-alpine,push-by-digest=true,name-canonical=true,push=true
+          push: true
           tags: medianestdev/base-alpine:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
