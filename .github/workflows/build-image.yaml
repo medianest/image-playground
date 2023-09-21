@@ -42,7 +42,7 @@ jobs:
         with:
           # push: true
           platforms: ${{ matrix.platform }}
-          file: ./base-apline/Dockerfile
+          file: ./base-alpine/Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ secrets.DOCKERHUB_USER }}/base-alpine,push-by-digest=true,name-canonical=true,push=true
           tags: ${{ secrets.DOCKERHUB_USER }}/base-alpine:latest
