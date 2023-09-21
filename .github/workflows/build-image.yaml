@@ -1,0 +1,62 @@
+name: Build Image
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USER }}/base-alpine
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  
+      - name: Build and Push
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          # push: true
+          platforms: ${{ matrix.platform }}
+          file: ./base-apline/Dockerfile
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ secrets.DOCKERHUB_USER }}/base-alpine,push-by-digest=true,name-canonical=true,push=true
+          tags: ${{ secrets.DOCKERHUB_USER }}/base-alpine:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"          
+      - name: Upload digest
+        uses: actions/upload-artifact@v3
+        with:
+          name: digests
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
