@@ -22,7 +22,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USER }}/base-alpine
+          images: ${{ vars.DOCKERHUB_USER }}/base-alpine
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -33,7 +33,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USER }}
+          username: ${{ vars.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
   
       - name: Build and Push
@@ -44,8 +44,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           file: ./base-alpine/Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ secrets.DOCKERHUB_USER }}/base-alpine,push-by-digest=true,name-canonical=true,push=true
-          tags: ${{ secrets.DOCKERHUB_USER }}/base-alpine:latest
+          outputs: type=image,name=${{ vars.DOCKERHUB_USER }}/base-alpine,push-by-digest=true,name-canonical=true,push=true
+          tags: docker.io/${{ vars.DOCKERHUB_USER }}/base-alpine:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Export digest
